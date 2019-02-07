@@ -1,192 +1,74 @@
 
 
-# Introduction to Linux
 
-## Preparation
-
-1. Boot from a usb stick (or live cd), we suggest to use  [Ubuntu gnome](http://ubuntugnome.org/) distribution, or another ubuntu derivative.
-
-2. (Optional) Configure keyboard layout and software repository
-   Go to the the *Activities* menu (top left corner, or *start* key):
-      -  Go to settings, then keyboard. Set the layout for latin america
-      -  Go to software and updates, and select the server for Colombia
-3. (Optional) Instead of booting from a live Cd. Create a partition in your pc's hard drive and install the linux distribution of your choice, the installed Os should perform better than the live cd.
-
-## Introduction to Linux
-
-1. Linux Distributions
-
-   Linux is free software, it allows to do all sort of things with it. The main component in linux is the kernel, which is the part of the operating system that interfaces with the hardware. Applications run on top of it. 
-   Distributions pack together the kernel with several applications in order to provide a complete operating system. There are hundreds of linux distributions available. In
-   this lab we will be using Ubuntu as it is one of the largest, better supported, and user friendly distributions.
-
-
-2. The graphical interface
-
-   Most linux distributions include a graphical interface. There are several of these available for any taste.
-   (http://www.howtogeek.com/163154/linux-users-have-a-choice-8-linux-desktop-environments/).
-   Most activities can be accomplished from the interface, but the terminal is where the real power lies.
-
-### Playing around with the file system and the terminal
-The file system through the terminal
-   Like any other component of the Os, the file system can be accessed from the command line. Here are some basic commands to navigate through the file system
-
-   -  ``ls``: List contents of current directory
-   - ``pwd``: Get the path  of current directory
-   - ``cd``: Change Directory
-   - ``cat``: Print contents of a file (also useful to concatenate files)
-   - ``mv``: Move a file
-   - ``cp``: Copy a file
-   - ``rm``: Remove a file
-   - ``touch``: Create a file, or update its timestamp
-   - ``echo``: Print something to standard output
-   - ``nano``: Handy command line file editor
-   - ``find``: Find files and perform actions on it
-   - ``which``: Find the location of a binary
-   - ``wget``: Download a resource (identified by its url) from internet 
-
-Some special directories are:
-   - ``.`` (dot) : The current directory
-   -  ``..`` (two dots) : The parent of the current directory
-   -  ``/`` (slash): The root of the file system
-   -  ``~`` (tilde) :  Home directory
-      
-Using these commands, take some time to explore the ubuntu filesystem, get to know the location of your user directory, and its default contents. 
-   
-To get more information about a command call it with the ``--help`` flag, or call ``man <command>`` for a more detailed description of it, for example ``man find`` or just search in google.
-
-
-## Input/Output Redirections
-Programs can work together in the linux environment, we just have to properly 'link' their outputs and their expected inputs. Here are some simple examples:
-
-1. Find the ```passwd```file, and redirect its contents error log to the 'Black Hole'
-   >  ``find / -name passwd  2> /dev/null``
-
-   The `` 2>`` operator redirects the error output to ``/dev/null``. This is a special file that acts as a sink, anything sent to it will disappear. Other useful I/O redirection operations are
-      -  `` > `` : Redirect standard output to a file
-      -  `` | `` : Redirect standard output to standard input of another program
-      -  `` 2> ``: Redirect error output to a file
-      -  `` < `` : Send contents of a file to standard input
-      -  `` 2>&1``: Send error output to the same place as standard output
-
-2. To modify the content display of a file we can use the following command. It sends the content of the file to the ``tr`` command, which can be configured to format columns to tabs.
-
-   ```bash
-   cat milonga.txt | tr '\n' ' '
-   ```
-   
-## SSH - Server Connection
-
-1. The ssh command lets us connect to a remote machine identified by SERVER (either a name that can be resolved by the DNS, or an ip address), as the user USER (**vision** in our case). The second command allows us to copy files between systems (you will get the actual login information in class).
-
-   ```bash
-   
-   #connect
-   ssh USER@SERVER
-   ```
-
-2. The scp command allows us to copy files form a remote server identified by SERVER (either a name that can be resolved by the DNS, or an ip address), as the user USER. Following the SERVER information, we add ':' and write the full path of the file we want to copy, finally we add the local path where the file will be copied (remember '.' is the current directory). If we want to copy a directory we add the -r option. for example:
-
-   ```bash
-   #copy 
-   scp USER@SERVER:~/data/sipi_images .
-   
-   scp -r USER@SERVER:/data/sipi_images .
-   ```
-   
-   Notice how the first command will fail without the -r option
-
-See [here](ssh.md) for different types of SSH connection with respect to your OS.
-
-## File Ownership and permissions   
-
-   Use ``ls -l`` to see a detailed list of files, this includes permissions and ownership
-   Permissions are displayed as 9 letters, for example the following line means that the directory (we know it is a directory because of the first *d*) *images*
-   belongs to user *vision* and group *vision*. Its owner can read (r), write (w) and access it (x), users in the group can only read and access the directory, while other users can't do anything. For files the x means execute. 
-   ```bash
-   drwxr-x--- 2 vision vision 4096 ene 25 18:45 images
-   ```
-   
-   -  ``chmod`` change access permissions of a file (you must have write access)
-   -  ``chown`` change the owner of a file
-   
-## Sample Exercise: Image database
-
-1. Create a folder with your Uniandes username. (If you don't have Linux in your personal computer)
-
-2. Copy *sipi_images* folder to your personal folder. (If you don't have Linux in your personal computer)
-
-3.  Decompress the images (use ``tar``, check the man) inside *sipi_images* folder. 
-
-4.  Use  ``imagemagick`` to find all *grayscale* images. We first need to install the *imagemagick* package by typing
-
-    ```bash
-    sudo apt-get install imagemagick
-    ```
-    
-    Sudo is a special command that lets us perform the next command as the system administrator
-    (super user). In general it is not recommended to work as a super user, it should only be used 
-    when it is necessary. This provides additional protection for the system.
-    
-    ```bash
-    find . -name "*.tiff" -exec identify {} \; | grep -i gray | wc -l
-    ```
-    
-3.  Create a script to copy all *color* images to a different folder
-    Lines that start with # are comments
-       
-      ```bash
-      #!/bin/bash
-      
-      # go to Home directory
-      cd ~ # or just cd
-
-      # remove the folder created by a previous run from the script
-      rm -rf color_images
-
-      # create output directory
-      mkdir color_images
-
-      # find all files whose name end in .tif
-      images=$(find sipi_images -name *.tiff)
-      
-      #iterate over them
-      for im in ${images[*]}
-      do
-         # check if the output from identify contains the word "gray"
-         identify $im | grep -q -i gray
-         
-         # $? gives the exit code of the last command, in this case grep, it will be zero if a match was found
-         if [ $? -eq 0 ]
-         then
-            echo $im is gray
-         else
-            echo $im is color
-            cp $im color_images
-         fi
-      done
-      
-      ```
-      -  save it for example as ``find_color_images.sh``
-      -  make executable ``chmod u+x`` (This means add Execute permission for the user)
-      -  run ``./find_duplicates.sh`` (The dot is necessary to run a program in the current directory)
-      
 
 ## Your turn
 
 1. What is the ``grep``command?
 
+The grep command is used to search files line by line. This command means global expression print which refers to process each text line to search an specific text or a given file containing a match. According to that, the grep command used on the script is to find the word gray within the sipi_images ignoring the uppercases or the lowercases [1].
+
 2. What is the meaning of ``#!/bin/python`` at the start of scripts?
 
+The meaning of the ``#!/bin/python`` command refers if the script is executable and then the script calls the language mentioned in the command to run the code. So, in this example, calls out the python language coding [2].  
+
 3. Download using ``wget`` the [*bsds500*](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/resources.html#bsds500) image segmentation database, and decompress it using ``tar`` (keep it in you hard drive, we will come back over this data in a few weeks).
- 
+
+ First i wrote the command wget and then i put the link mentioned. Then, the download started and lasted for 7 minutes. After that, i decompressed the archive using tar command. For that, i used the specifications '-x' for extract the file, 'z' for extracting the file with gzip, 'v' for displaying progress in the terminal and 'f' to specify the name of the resulting file [3]. 
+
 4. What is the disk size of the uncompressed dataset, How many images are in the directory 'BSR/BSDS500/data/images'?
  
+The disk size used for the dataset named as BSR is 73 MB. That information was found using the command 'du' that stands for disk usage. I used the parameters '-sh' where the first one gave me the summary within all files in the directory and the second one gave me the size in units as KB, MB and so on.  
+
+There are 201 train images, 201 test images and 101 validation images. In order to get to this information, i went to each directory and put the command 'ls -l | wc -l'; where the first part of the command refers to list all the files in the current directory. The '-l' parameter tells me the status of the file in the directory. Then, the '| wc-l' command was used to count the lines printed by the ls command, that is because wc means word count and the parameter '-l' provides the line count. Considering that the ls command gives one line of extra information (total), the real number of images is the number given by the previous command minus 1.  
+
 5. What are all the different resolutions? What is their format? Tip: use ``awk``, ``sort``, ``uniq`` 
+
+The resolutions of the images are 481x321 and 321x481. In order to get that information, i looked out for the format and characteristics of the image files using the command 'identify' but first i used the command 'find' to find all the archives. Identify gives a line of information of the archive, so that is why i then used 'awk {print $3}' to print only the third column of information given by 'identify'. After that, i used sort to organize the column with previous results and finally i asked for the repeated lines in a file using 'uniq'. 
+The line code used is presented below, 
+find . -name "*.*" -exec identify {} \; | awk '{print $3}' | sort | uniq
+The format of the images is .jpg and the command used to find that information was the latter with the modification of the column printed by 'awk' because the interest here is for the format and not for the size of the image. So, the column 2 was used. 
 
 6. How many of them are in *landscape* orientation (opposed to *portrait*)? Tip: use ``awk`` and ``cut``
  
+There are 152 images with landscape orientation (321x481). The code used started with a script. Inside this script, all the images in the directory were found and assigned to a variable. A counter was initialized and a iteration was made over the imager with a for. Using 'identify','awk' and 'cut' it was possible to save two new variables corresponding to the width and height of each image. The first two programs were used, as explained before, to seek within the images the resolution of each one. Then, 'cut' was used to separate the width and heigth in order to save them in two different variables. After that, inside the for a logical question was made to see if the width was greater than the heigth, if this condition was fulfilled the counter was actualized. The code used in this part is presented below.
+
+#!/bin/bash
+
+# remove the folder created by a previous run from the script
+rm -rf P4
+
+# create output directory
+mkdir P4
+
+# find all files whose name end in .tif
+images=$(find -name *.jpg)
+
+#iterate over them
+count = 0
+for im in ${images[*]}
+do
+   r=$(identify $im | awk '{print $3}' | cut -d "x" -f 1)
+   c=$(identify $im | awk '{print $3}' | cut -d "x" -f 2)
+   if [ $c -ge $r ]
+   then
+      echo $im is landscape
+      count=$((count+1))
+   else
+      echo $im is portrait
+     fi
+ done
+ echo $count
 7. Crop all images to make them square (256x256) and save them in a different folder. Tip: do not forget about  [imagemagick](http://www.imagemagick.org/script/index.php).
+
+First, a new directory was created with 'mkdir' and copy all the files in it (using 'cp'). Then, the modrify program was used. The parameters were '-resize' to give an specific size of the output image and "256x256^!" were the exclamation mark ensures that 256x256 is the only output size. It was necessary to create and copy the files first because 'mogrify' rewrite the output into the input file. The line codes used in this part are presented below.
+mogrify -resize "256x256^!"  *.jpg
+find . -name "*.*" -exec identify {} \; | awk '{print $3}' | sort | uniq
+
+References
+[1] Linux grep command usage with examples. Interserver.net.2018. Available: https://www.interserver.net/tips/kb/linux-grep-command-usage-examples/
+[2] Mu\F1oz, A. \BFCu\E1l es la diferencia entre  #!/usr/bin/python y #!/usr/bin/env python?. Stack overflow. Available: https://es.stackoverflow.com/questions/4034/cu%C3%A1l-es-la-diferencia-entre-usr-bin-python-y-usr-bin-env-python
+[3] How to compress and extract files using the tar command on Linux. How to geek. 2018. Available:  https://www.howtogeek.com/248780/how-to-compress-and-extract-files-using-the-tar-command-on-linux/
 
 
 # Report
