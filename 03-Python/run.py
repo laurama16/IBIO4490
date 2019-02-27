@@ -67,8 +67,7 @@ for i in rand:
    cv2_im_rgb = cv2.cvtColor(imCrop, cv2.COLOR_BGR2RGB)
    pil_im = Image.fromarray(cv2_im_rgb)   
    draw = ImageDraw.Draw(pil_im) 
-   fontsize = 50
-   font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMono.ttf", fontsize)
+   font = ImageFont.load_default()
    draw.text((150, 150),str(level[cont]), font=font,fill = (255,255,255))
    
    # Save the image

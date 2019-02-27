@@ -9,3 +9,10 @@ solution/
 _data/
 *.pyc
 .ipynb*
+*.zip
+blood-cells/
+*.jpg
+*.JPEG
+LabPython/
+*.tar.gz
+*.tar
