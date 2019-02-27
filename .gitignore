@@ -14,5 +14,6 @@ blood-cells/
 *.jpg
 *.JPEG
 LabPython/
+Resized/
 *.tar.gz
 *.tar
