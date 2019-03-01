@@ -17,3 +17,7 @@ LabPython/
 Resized/
 *.tar.gz
 *.tar
+05-Textons/python/cifar-10-patches-py/
+*.txt
+dddd.py
+readdata.py
