@@ -1,4 +1,5 @@
 # Berkeley Segmentation Dataset and Benchmark (BSDS500)
+# in the script main.py is the code for the segmentations for the two proposed methods. And in matlab it is only needed to run the plot_eval function, with the directories.
 
 In this lab you will be testing your previously developed segmentation functions in a real and large segmentation database, the BSDS500. To add some extra motivation, you will also be comparing your methods against that of your teacher, can you beat him?
 
