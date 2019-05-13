@@ -35,3 +35,8 @@ celeba-dataset/
 13-FCN/data/
 13-FCN/logs/
 13-FCN/fcn.berkeleyvision.org
+/14-GANs/__pycache__/
+/14-GANs/dataset
+/14-GANs/runs
+/14-GANs/torch_data
+/14-GANs/checkpoint.pth.tar
